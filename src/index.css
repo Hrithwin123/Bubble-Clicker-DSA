@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* Custom animations and styles */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Smooth circle animations */
+.circle-enter {
+  animation: circleAppear 0.3s ease-out;
+}
+
+@keyframes circleAppear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pulse effect for score */
+.score-pulse {
+  animation: scorePulse 0.2s ease-out;
+}
+
+@keyframes scorePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Heart flying animation from click position to life stack */
+@keyframes heartFly {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  20% {
+    transform: translate(calc(var(--target-x) * 0.1), calc(var(--target-y) * 0.1)) scale(1.2);
+    opacity: 1;
+  }
+  80% {
+    transform: translate(calc(var(--target-x) * 0.9), calc(var(--target-y) * 0.9)) scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--target-x), var(--target-y)) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* Cursor styles */
+.cursor-crosshair {
+  cursor: crosshair;
+}
+
+/* Bubble floating animation */
+@keyframes bubbleFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Bubble pop effect */
+@keyframes bubblePop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+/* Glow pulse for powerup bubbles */
+@keyframes glowPulse {
+  0%, 100% {
+    filter: brightness(1) drop-shadow(0 0 10px rgba(255, 255, 255, 0.5));
+  }
+  50% {
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+  }
+}
+
+/* Particle explosion effect */
+@keyframes particleExplosion {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--vx), var(--vy)) scale(0);
+    opacity: 0;
+  }
+}
