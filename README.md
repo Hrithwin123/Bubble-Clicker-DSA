@@ -36,34 +36,75 @@ if (!lifeStack.isEmpty()) {
 
 ---
 
-### 2. **Queue - Powerup Management System** 🔄
+### 2. **Circular Queue - Powerup Management System** 🔄
 **File:** `src/utils/powerupQueue.ts`
 
-**Problem Solved:** Managing multiple powerups with FIFO (First In, First Out) behavior
+**Problem Solved:** Managing multiple powerups with FIFO (First In, First Out) behavior while optimizing space usage
 
 **Implementation:**
-- **Enqueue**: Add collected powerups to queue
-- **Dequeue**: Activate next powerup when current expires
-- **Front**: Check which powerup is currently active
+- **Fixed-Size Array**: Pre-allocated array of size 5
+- **Circular Indexing**: Uses modulo arithmetic to wrap around
+- **Enqueue**: Add powerups at `back` position with `(back + 1) % size`
+- **Dequeue**: Remove from `front` position with `(front + 1) % size`
+- **Space Reuse**: Old slots are reused instead of wasted
 
-**Why Queue?**
-- Ensures fair powerup activation order (first collected, first activated)
-- Prevents powerup conflicts (only one active at a time)
-- O(1) time complexity for enqueue/dequeue operations
-- Visual queue display shows upcoming powerups
+**Why Circular Queue over Linear Queue?**
+- **Space Efficient**: Reuses array slots instead of leaving them empty
+- **No Shifting**: Unlike linear queues, no need to shift elements
+- **Fixed Memory**: Constant O(1) space regardless of operations
+- **Cache Friendly**: Contiguous memory allocation
+- **Prevents Overflow**: Wraps around instead of running out of space
+
+**Key Operations:**
+```typescript
+// O(1) - Enqueue with circular wrap
+addPowerup(powerup: string): boolean {
+  if (isFull()) return false;
+  back = (back + 1) % size;  // Circular increment
+  queue[back] = powerup;
+  count++;
+}
+
+// O(1) - Dequeue with circular wrap
+removePowerup(): string | undefined {
+  if (isEmpty()) return undefined;
+  const item = queue[front];
+  front = (front + 1) % size;  // Circular increment
+  count--;
+  return item;
+}
+```
+
+**Circular Queue Visualization:**
+```
+Initial: [_, _, _, _, _]  front=0, back=-1, count=0
+
+Add 'slow':  [slow, _, _, _, _]  front=0, back=0, count=1
+Add '2x':    [slow, 2x, _, _, _]  front=0, back=1, count=2
+Remove:      [_, 2x, _, _, _]     front=1, back=1, count=1
+Add 'slow':  [_, 2x, slow, _, _]  front=1, back=2, count=2
+Add '2x':    [_, 2x, slow, 2x, _] front=1, back=3, count=3
+Add 'slow':  [_, 2x, slow, 2x, slow] front=1, back=4, count=4
+Add '2x':    [2x, 2x, slow, 2x, slow] front=1, back=0, count=5 ← Wrapped!
+```
 
 **Game Integration:**
 ```typescript
 // Collect powerup
 if (activePowerup) {
-  powerupQueue.enqueue('slowtime'); // Queue for later
+  powerupQueue.addPowerup('slowtime'); // Queue for later
 } else {
   activatePowerup('slowtime'); // Use immediately
 }
 
 // When powerup expires
-const next = powerupQueue.dequeue();
+const next = powerupQueue.removePowerup();
 if (next) activatePowerup(next);
+
+// Check if queue is full (max 5 powerups)
+if (powerupQueue.isFull()) {
+  console.log('Cannot collect more powerups!');
+}
 ```
 
 ---
@@ -233,8 +274,26 @@ http://localhost:5173
 | Data Structure | Space | Notes |
 |----------------|-------|-------|
 | Stack | O(1) | Fixed capacity (10 lives) |
-| Queue | O(k) | k = number of queued powerups |
+| Circular Queue | O(1) | Fixed capacity (5 powerups) |
 | Doubly Linked List | O(n) | n = number of leaderboard entries |
+
+### Circular Queue Advantages
+
+**Space Efficiency Comparison:**
+
+| Queue Type | Space Usage | Wasted Space | Reusability |
+|------------|-------------|--------------|-------------|
+| Linear Queue | O(n) | High - front slots unused | No - requires shifting |
+| Circular Queue | O(1) | None - all slots reused | Yes - wraps around |
+
+**Example Scenario:**
+```
+Linear Queue after 3 enqueue/dequeue cycles:
+[_, _, _, slow, 2x] ← 3 wasted slots at front!
+
+Circular Queue after 3 enqueue/dequeue cycles:
+[2x, _, _, _, slow] ← All slots available for reuse!
+```
 
 ---
 
