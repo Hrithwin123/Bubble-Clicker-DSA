@@ -1,4 +1,4 @@
-# Aim Trainer Backend API
+# Bubble.io Backend API
 
 ## Setup
 

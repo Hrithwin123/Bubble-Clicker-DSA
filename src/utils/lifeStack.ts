@@ -10,19 +10,18 @@ export default class LifeStack {
         this.top = 2;
     }
 
-    addLife(a : number) { //push
+    addLife(a : number) { 
         this.top++;
         this.stack[this.top] = a;
     }
 
-    removeLife() { //pop
+    removeLife() { 
         this.top--;
     }
 
-    currentLife() { //top element of stack
+    currentLife() { 
         return this.stack[this.top];
     }
-
 
 
 }

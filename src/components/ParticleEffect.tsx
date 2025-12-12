@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface Particle {
     id: number;
@@ -8,6 +9,7 @@ interface Particle {
     vy: number;
     color: string;
     size: number;
+    delay: number;
 }
 
 interface ParticleEffectProps {
@@ -19,10 +21,10 @@ interface ParticleEffectProps {
 
 export default function ParticleEffect({ x, y, color, onComplete }: ParticleEffectProps) {
     const [particles] = useState<Particle[]>(() => {
-        const particleCount = 8;
+        const particleCount = 12; // Increased for more dramatic effect
         return Array.from({ length: particleCount }, (_, i) => {
-            const angle = (Math.PI * 2 * i) / particleCount;
-            const speed = 2 + Math.random() * 2;
+            const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+            const speed = 3 + Math.random() * 4;
             return {
                 id: i,
                 x: 0,
@@ -30,13 +32,14 @@ export default function ParticleEffect({ x, y, color, onComplete }: ParticleEffe
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
                 color,
-                size: 4 + Math.random() * 4,
+                size: 3 + Math.random() * 6,
+                delay: Math.random() * 0.1,
             };
         });
     });
 
     useEffect(() => {
-        const timer = setTimeout(onComplete, 500);
+        const timer = setTimeout(onComplete, 800);
         return () => clearTimeout(timer);
     }, [onComplete]);
 
@@ -49,16 +52,33 @@ export default function ParticleEffect({ x, y, color, onComplete }: ParticleEffe
             }}
         >
             {particles.map((particle) => (
-                <div
+                <motion.div
                     key={particle.id}
-                    className={`absolute rounded-full ${particle.color}`}
+                    className={`absolute rounded-full ${particle.color} will-change-transform`}
                     style={{
                         width: `${particle.size}px`,
                         height: `${particle.size}px`,
-                        animation: 'particleExplosion 0.5s ease-out forwards',
-                        '--vx': `${particle.vx * 20}px`,
-                        '--vy': `${particle.vy * 20}px`,
-                    } as React.CSSProperties}
+                        boxShadow: `0 0 ${particle.size * 2}px currentColor`,
+                    }}
+                    initial={{
+                        x: 0,
+                        y: 0,
+                        scale: 1,
+                        opacity: 1,
+                        rotate: 0,
+                    }}
+                    animate={{
+                        x: particle.vx * 30,
+                        y: particle.vy * 30,
+                        scale: [1, 1.2, 0],
+                        opacity: [1, 0.8, 0],
+                        rotate: 360,
+                    }}
+                    transition={{
+                        duration: 0.8,
+                        delay: particle.delay,
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                    }}
                 />
             ))}
         </div>

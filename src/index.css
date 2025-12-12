@@ -4,7 +4,18 @@
 body {
   margin: 0;
   padding: 0;
+}
+
+/* Game page specific - hide overflow for game area */
+.game-page {
   overflow: hidden;
+}
+
+/* Allow scrolling on leaderboard page */
+.leaderboard-page {
+  overflow: visible;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 /* Smooth circle animations */
@@ -105,4 +116,38 @@ body {
     transform: translate(var(--vx), var(--vy)) scale(0);
     opacity: 0;
   }
+}
+
+/* Custom Scrollbar Styles */
+.scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+  background-clip: content-box;
+}
+
+/* Utility Classes */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
 }

@@ -37,7 +37,6 @@ export default function GamePage() {
   const [circles, setCircles] = useState<Circle[]>([]);
   const [score, setScore] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(60);
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [lives, setLives] = useState(3);
   const [gameOver, setGameOver] = useState(false);
@@ -213,9 +212,14 @@ export default function GamePage() {
               // No active powerup, activate immediately
               activatePowerup(clickedCircle.type);
             } else {
-              // Add to queue
-              powerupQueueRef.current.addPowerup(clickedCircle.type);
-              setQueuedPowerups(powerupQueueRef.current.getQueuedPowerups());
+              // There's an active powerup, add this one to queue
+              const added = powerupQueueRef.current.addPowerup(clickedCircle.type);
+              if (added) {
+                setQueuedPowerups(powerupQueueRef.current.getQueuedPowerups());
+                console.log('Powerup added to queue:', clickedCircle.type, 'Queue size:', powerupQueueRef.current.getCount());
+              } else {
+                console.log('Queue is full, powerup not added');
+              }
             }
           }
         } else {
@@ -231,7 +235,6 @@ export default function GamePage() {
   const startGame = () => {
     setGameStarted(true);
     setScore(0);
-    setTimeLeft(60);
     setCircles([]);
     setLives(3);
     setGameOver(false);
@@ -244,7 +247,6 @@ export default function GamePage() {
   const resetGame = () => {
     setGameStarted(false);
     setScore(0);
-    setTimeLeft(60);
     setCircles([]);
     setCurrentTime(Date.now());
     setLives(3);
@@ -272,22 +274,7 @@ export default function GamePage() {
     return () => clearInterval(animationFrame);
   }, [gameStarted]);
 
-  // Game timer
-  useEffect(() => {
-    if (!gameStarted || timeLeft <= 0 || gameOver) return;
 
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          setGameStarted(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [gameStarted, timeLeft, gameOver]);
 
   // Powerup management
   useEffect(() => {
@@ -302,11 +289,11 @@ export default function GamePage() {
         }
 
         // Check if there's a next powerup in queue
-        if (powerupQueueRef.current) {
-          const nextPowerup = powerupQueueRef.current.currentPowerup();
+        if (powerupQueueRef.current && !powerupQueueRef.current.isEmpty()) {
+          const nextPowerup = powerupQueueRef.current.removePowerup();
           if (nextPowerup) {
-            powerupQueueRef.current.removePowerup();
             setQueuedPowerups(powerupQueueRef.current.getQueuedPowerups());
+            console.log('Activating next powerup from queue:', nextPowerup, 'Remaining queue:', powerupQueueRef.current.getQueuedPowerups());
             activatePowerup(nextPowerup);
           } else {
             setActivePowerup(null);
@@ -335,12 +322,12 @@ export default function GamePage() {
   }, [gameStarted, gameOver, createCircle, activePowerup]);
 
   return (
-    <div className="h-screen w-screen bg-gradient-to-br from-slate-900 to-slate-800 relative overflow-hidden">
+    <div className="game-page h-screen w-screen bg-linear-to-br from-slate-900 to-slate-800 relative overflow-hidden">
       {/* Header UI */}
       <div className="absolute top-0 left-0 right-0 z-10 p-6 flex justify-between items-center">
         <div className="text-white">
           <div className="flex items-center gap-4 mb-2">
-            <h1 className="text-3xl font-bold">Aim Trainer</h1>
+            <h1 className="text-3xl font-bold">Bubble.io</h1>
             <button
               onClick={() => navigate('/leaderboard')}
               className="flex items-center gap-2 px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-semibold transition-colors"
@@ -350,9 +337,6 @@ export default function GamePage() {
             </button>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-lg">
-              Time: <span className="font-mono text-yellow-400">{timeLeft}s</span>
-            </div>
             <div ref={heartsContainerRef} className="flex items-center gap-1 relative">
               {Array.from({ length: 10 }, (_, i) => (
                 <div key={i} className="relative">
@@ -494,10 +478,10 @@ export default function GamePage() {
         {!gameStarted && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
             <div className="text-center text-white">
-              {timeLeft === 0 || gameOver ? (
+              {gameOver ? (
                 <div>
                   <h2 className="text-4xl font-bold mb-4">
-                    {gameOver ? 'No Lives Left!' : 'Time\'s Up!'}
+                    Game Over!
                   </h2>
                   <p className="text-xl mb-6">Final Score: {score}</p>
                   <div className="flex gap-4 justify-center">
@@ -517,8 +501,8 @@ export default function GamePage() {
                 </div>
               ) : (
                 <div>
-                  <h2 className="text-4xl font-bold mb-4">Ready to Train?</h2>
-                  <p className="text-lg mb-6 text-gray-300">Click circles to score • Don't let them disappear!</p>
+                  <h2 className="text-4xl font-bold mb-4">Ready to Pop?</h2>
+                  <p className="text-lg mb-6 text-gray-300">Click bubbles to score • Collect powerups • Survive as long as you can!</p>
                   <button
                     onClick={startGame}
                     className="px-8 py-4 bg-green-600 hover:bg-green-700 rounded-lg text-xl font-semibold transition-colors"
@@ -534,7 +518,7 @@ export default function GamePage() {
 
       {/* Instructions */}
       <div className="absolute bottom-4 left-4 text-white/70 text-sm">
-        <p>Click circles to score • Miss = lose life • Pink = +1 life • Blue = slow time • Yellow = 2x score</p>
+        <p>💗 Pink = +1 life • 🕐 Blue = Slow time • ⚡ Yellow = 2x score</p>
       </div>
 
       {/* Save Score Modal */}

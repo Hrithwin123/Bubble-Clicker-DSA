@@ -1,7 +1,7 @@
 {
-  "name": "click",
+  "name": "bubble.io",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.16",
     "esrun": "^3.2.30",
+    "framer-motion": "^12.23.26",
     "lucide-react": "^0.548.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

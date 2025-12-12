@@ -1,7 +1,7 @@
 {
-  "name": "back",
+  "name": "bubble.io-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend API for Bubble.io game",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

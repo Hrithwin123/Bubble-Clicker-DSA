@@ -10,13 +10,13 @@ export default class PowerupQueue {
         this.front = 0;
         this.back = -1;
         this.count = 0;
-        
+
         this.queue = new Array(this.size);
     }
 
-    // Enqueue - Add powerup to the queue
+
     addPowerup(powerup: string): boolean {
-        
+
         if (this.isFull()) {
             console.warn('Powerup queue is full!');
             return false;
@@ -28,20 +28,20 @@ export default class PowerupQueue {
         return true;
     }
 
-    
+
     removePowerup(): string | undefined {
         if (this.isEmpty()) {
             return undefined;
         }
 
         const powerup = this.queue[this.front];
-        this.queue[this.front] = undefined; 
-        this.front = (this.front + 1) % this.size; 
+        this.queue[this.front] = undefined;
+        this.front = (this.front + 1) % this.size;
         this.count--;
         return powerup;
     }
 
-    
+
     currentPowerup(): string | undefined {
         if (this.isEmpty()) {
             return undefined;
@@ -49,15 +49,15 @@ export default class PowerupQueue {
         return this.queue[this.front];
     }
 
-    
+
     getQueuedPowerups(): string[] {
-        if (this.isEmpty()) {
+        if (this.count <= 1) {
             return [];
         }
 
         const queued: string[] = [];
-        let index = (this.front + 1) % this.size; 
-        let itemsToCheck = this.count - 1; 
+        let index = (this.front + 1) % this.size; // Skip the first item (currently active)
+        let itemsToCheck = this.count - 1; // Don't include the first item
 
         while (itemsToCheck > 0) {
             const powerup = this.queue[index];
@@ -71,27 +71,27 @@ export default class PowerupQueue {
         return queued;
     }
 
-    
+
     isEmpty(): boolean {
         return this.count === 0;
     }
 
-    
+
     isFull(): boolean {
         return this.count === this.size;
     }
 
-    
+
     getCount(): number {
         return this.count;
     }
 
-    
+
     getCapacity(): number {
         return this.size;
     }
 
-    
+
     clear(): void {
         this.front = 0;
         this.back = -1;
@@ -99,7 +99,7 @@ export default class PowerupQueue {
         this.queue = new Array(this.size);
     }
 
-    
+
     getQueueState(): {
         front: number;
         back: number;
